@@ -1,0 +1,77 @@
+syntax = "proto3";
+package tutorial;
+
+option go_package = "./pkg";
+
+
+message req_getUserByUuid {
+    string uuid = 1;
+}
+
+message res_getUserByUuid {
+    int64 id = 1;
+}
+
+message req_getCutList {
+    int64 user_id = 1;
+}
+
+message res_getCutList {
+    bool this_is_cut = 1;
+    int64 id = 2;
+    string name = 3;
+    string color = 4;
+    int64 count = 5;
+    int64 limit = 6;
+    int64 late_time = 7;
+    int64 late_count = 8;
+    string created_at = 9;
+    string updated_at = 10;
+}
+
+message req_getCutHistory {
+    int64 user_id = 1;
+}
+
+message res_getCutHistory {
+    int64 id = 1;
+    string updated_at = 2;
+}
+
+
+service CutListService {
+    rpc GetUserByUuid (req_getUserByUuid) returns (res_getUserByUuid);
+    rpc GetCutList (req_getCutList) returns (stream res_getCutList);
+    rpc GetHistory (req_getCutHistory) returns (stream res_getCutHistory);
+}
+
+
+
+message req_getEventList {
+    int64 user_id = 1;
+}
+
+message res_getEventList {
+    int64 id = 1;
+    string name = 2;
+    string color = 3;
+    int64 count = 4;
+    int64 limit = 5;
+    string created_at = 6;
+    string updated_at = 7;  
+}
+
+message req_getEventHistory {
+    int64 user_id = 1;
+}
+
+message res_getEventHistory {
+    int64 id = 1;
+    string updated_at = 2;
+}
+
+service EventListService {
+    rpc GetUserByUuid (req_getUserByUuid) returns (res_getUserByUuid);
+    rpc GetEventList (req_getEventList) returns (stream res_getEventList);
+    rpc GetHistory (req_getEventHistory) returns (stream res_getEventHistory);
+}
