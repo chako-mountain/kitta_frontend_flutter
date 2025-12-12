@@ -188,11 +188,14 @@ class _createCutListState extends State<createCutList> {
           controller: myController1,
           // decoration: InputDecoration(hintText: '授業名'),
         ),
-        if (latetime) Text("遅刻時間（分）入力"),
-        TextField(
-          controller: myController2,
-          decoration: InputDecoration(hintText: '遅刻時間（分）'),
-        ),
+        if (latetime) ...[
+          Text("遅刻時間入力 (分)"),
+          TextField(
+            controller: myController2,
+            // decoration: InputDecoration(hintText: '遅刻時間（分）'),
+          ),
+        ],
+
         // TextField(
         //   decoration: InputDecoration(
         //     labelText: "遅刻の理由",
