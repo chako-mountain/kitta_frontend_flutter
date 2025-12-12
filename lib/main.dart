@@ -30,7 +30,7 @@ void main() {
 }
 
 final myController1 = TextEditingController();
-final myController2 = TextEditingController();
+final myController2 = TextEditingController(text: "5");
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -103,13 +103,7 @@ class MyApp extends StatelessWidget {
             // content: const Text("Do you allow notifications?"),
             content: Column(
               mainAxisSize: MainAxisSize.min, // ダイアログの高さを最小に
-              children: [
-                createCutList(),
-                TextField(
-                  controller: myController1,
-                  decoration: InputDecoration(hintText: '授業名'),
-                ),
-              ],
+              children: [createCutList()],
             ),
 
             actions: <Widget>[
@@ -147,6 +141,8 @@ class _createCutListState extends State<createCutList> {
   int selectValueCut = 1; // ← 修正ポイント
   int selectValueLate = 0; // ← 修正ポイント
   String result = "";
+  bool latetime = false;
+  int defaultlateTime = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +162,7 @@ class _createCutListState extends State<createCutList> {
                   if (isSelected) {
                     selectValueLate = 0; // もう一方をオフにする
                   }
+                  latetime = false;
                 });
               },
             ),
@@ -179,11 +176,22 @@ class _createCutListState extends State<createCutList> {
                   if (isSelected) {
                     selectValueCut = 0; // もう一方をオフにする
                   }
-                  TextField();
+                  // TextField();
+                  latetime = true;
                 });
               },
             ),
           ],
+        ),
+        Text("授業名入力"),
+        TextField(
+          controller: myController1,
+          // decoration: InputDecoration(hintText: '授業名'),
+        ),
+        if (latetime) Text("遅刻時間（分）入力"),
+        TextField(
+          controller: myController2,
+          decoration: InputDecoration(hintText: '遅刻時間（分）'),
         ),
         // TextField(
         //   decoration: InputDecoration(
