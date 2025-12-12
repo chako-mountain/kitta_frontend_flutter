@@ -37,6 +37,14 @@ class MyApp extends StatelessWidget {
 
   // final myController = TextEditingController();
 
+  final bool selectValue = false;
+
+  // Future<void> CreateCutList(cutList) async {
+  //   final client = GrpcClient();
+  //   await client.CreateCutList(cutList);
+  //   await client.shutdown();
+  // }
+
   Future<void> storeUuid(String uuid) async {
     final prefs = await SharedPreferences.getInstance();
     final String? action = prefs.getString('user_uuid');
@@ -96,42 +104,27 @@ class MyApp extends StatelessWidget {
             content: Column(
               mainAxisSize: MainAxisSize.min, // ダイアログの高さを最小に
               children: [
-                TextField(decoration: InputDecoration(labelText: "名前")),
-                SizedBox(height: 10), // 少しスペースを空ける
-                TextField(decoration: InputDecoration(labelText: "色")),
+                createCutList(),
                 TextField(
                   controller: myController1,
-                  decoration: InputDecoration(hintText: '趣味'),
+                  decoration: InputDecoration(hintText: '授業名'),
                 ),
-                TextField(
-                  controller: myController2,
-                  decoration: InputDecoration(hintText: '趣味'),
-                ),
-                // getText(),
               ],
             ),
 
-            // content: TextField(),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Cancel'),
+                child: const Text('キャンセル'),
               ),
               TextButton(
                 onPressed: () {
                   final inputText1 = myController1.text; // ← ここで値を取得
-                  final inputText2 = myController2.text; // ← ここで値を取得
                   print('Input Text: $inputText1');
-                  print('Input Text: $inputText2');
                   Navigator.of(context).pop(); // ダイアログを閉じる
-
                   cutList.name = inputText1;
-                  cutList.color = inputText2;
                 },
-                // print('Input Text: $inputText')},
-                child: const Text('Approve'),
-                // final inputText = myController.text;
-                // print('Input Text: $inputText')
+                child: const Text('作成'),
               ),
             ],
           ),
@@ -139,6 +132,67 @@ class MyApp extends StatelessWidget {
         label: const Text('追加'),
         icon: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class createCutList extends StatefulWidget {
+  const createCutList({super.key});
+
+  @override
+  State<createCutList> createState() => _createCutListState();
+}
+
+class _createCutListState extends State<createCutList> {
+  int selectValueCut = 1; // ← 修正ポイント
+  int selectValueLate = 0; // ← 修正ポイント
+  String result = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            ChoiceChip(
+              label: Text("切る"),
+              // isSelected: selectValueCut == 1,
+              selected: selectValueCut == 1,
+              onSelected: (bool isSelected) {
+                setState(() {
+                  selectValueCut = isSelected ? 1 : 0;
+                  result = selectValueCut.toString();
+                  if (isSelected) {
+                    selectValueLate = 0; // もう一方をオフにする
+                  }
+                });
+              },
+            ),
+            ChoiceChip(
+              label: Text("遅刻"),
+              selected: selectValueLate == 1,
+              onSelected: (bool isSelected) {
+                setState(() {
+                  selectValueLate = isSelected ? 1 : 0;
+                  result = selectValueLate.toString();
+                  if (isSelected) {
+                    selectValueCut = 0; // もう一方をオフにする
+                  }
+                  TextField();
+                });
+              },
+            ),
+          ],
+        ),
+        // TextField(
+        //   decoration: InputDecoration(
+        //     labelText: "遅刻の理由",
+        //     border: OutlineInputBorder(),
+        //   ),
+        // ),
+        // Text("選択中: $result"),
+      ],
     );
   }
 }

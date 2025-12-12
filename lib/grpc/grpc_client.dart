@@ -26,6 +26,20 @@ class CreateCutList {
   });
 }
 
+class CreateCutListHistory {
+  final bool thisIsCut;
+  final int cutListId;
+  final String action;
+  final String timestamp;
+
+  const CreateCutListHistory({
+    required this.thisIsCut,
+    required this.cutListId,
+    required this.action,
+    required this.timestamp,
+  });
+}
+
 /// gRPC クライアントクラス
 class GrpcClient {
   late final ClientChannel _channel;
