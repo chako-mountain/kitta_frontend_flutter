@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kitta_backend_flutter/pkg/test.pb.dart';
 import 'grpc/grpc_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,20 +25,42 @@ class CreateCutList {
   });
 }
 
+final bool namealaert = false;
+bool thisisCut = true;
+int userID = 0;
+
 void main() {
   // runApp(const MyApp());
-  runApp(const MaterialApp(home: MyApp()));
+  runApp(MaterialApp(home: MyApp()));
 }
 
 final myController1 = TextEditingController();
 final myController2 = TextEditingController(text: "5");
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // MyApp({super.key});
 
   // final myController = TextEditingController();
 
   final bool selectValue = false;
+
+  Future<void> _loadCutLists() async {
+    final client = GrpcClient();
+    final result2 = await client.GetCutList(10);
+    setState(() {
+      // DrawCardsに渡すデータを更新
+      final cardCount = result2.length;
+      DrawCards(cardNumber: cardCount);
+    });
+    await client.shutdown();
+  }
 
   // Future<void> CreateCutList(cutList) async {
   //   final client = GrpcClient();
@@ -45,19 +68,32 @@ class MyApp extends StatelessWidget {
   //   await client.shutdown();
   // }
 
+  final client = GrpcClient();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCutLists();
+  }
+
   Future<void> storeUuid(String uuid) async {
     final prefs = await SharedPreferences.getInstance();
     final String? action = prefs.getString('user_uuid');
     print(action);
 
     if (action == null) {
-      final client = GrpcClient();
+      // final client = GrpcClient();
       await prefs.setString('user_uuid', uuid);
       print("UUID stored: $uuid");
-      final userid = await client.CreateUser(uuid);
-      print(userid);
+      final userID = await client.CreateUser(uuid);
+      print(userID);
+      // userID = userid;
     } else {
+      final USERID = await client.getUserIdByUuid(
+        "3dd25cc6-c92a-4941-b736-5045afab5eaf",
+      );
       print("UUID already exists: $action");
+      print(USERID);
     }
   }
 
@@ -65,13 +101,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final cutList = CreateCutList(
       thisIsCut: true,
-      userId: 10,
+      userId: userID,
       name: "testlist",
       color: "blue",
       count: 10,
       limit: 5,
-      lateTime: 2,
-      lateCount: 1,
+      lateTime: 0,
+      lateCount: 0,
     );
 
     return Scaffold(
@@ -80,13 +116,38 @@ class MyApp extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // DrawCards(cardNumber: cardCount),
+            // DrawCards(cardCount),
+            // DrawCards(cardNumber: cardCount),
+            // ListView(
+            //   padding: const EdgeInsets.all(16),
+            //   children: [DrawCards(cardNumber: 10)],
+            // ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(children: [DrawCards(cardNumber: 10)]),
+              ),
+            ),
+
+            // ListView(children: [DrawCards(cardNumber: 10)]),
             ElevatedButton(
               child: const Text("Send UUID"),
               onPressed: () async {
                 final client = GrpcClient();
                 const uuid = "3dd25cc6-c92a-4941-b736-5045afab5eaf";
                 await storeUuid(uuid);
-                await client.CreateCutList(cutList); // 必要に応じて有効化
+                // await client.CreateCutList(cutList); // 必要に応じて有効化
+
+                final result2 = await client.GetCutList(10);
+                final length = result2.length;
+                for (int i = 0; i < result2.length; i++) {
+                  print("$i 番目の要素です");
+                  print(result2[i]);
+                }
+                // print("これが0番目");
+                // print(result2[0]);
+                DrawCards(cardNumber: result2.length);
+
                 await client.shutdown();
               },
             ),
@@ -112,11 +173,26 @@ class MyApp extends StatelessWidget {
                 child: const Text('キャンセル'),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   final inputText1 = myController1.text; // ← ここで値を取得
+                  final inputText2 = myController2.text; // ← ここで値を取得
                   print('Input Text: $inputText1');
+                  if (inputText1 == '') {
+                    print('Error: 授業名が入力されていません。');
+                    return;
+                  }
                   Navigator.of(context).pop(); // ダイアログを閉じる
+
                   cutList.name = inputText1;
+                  cutList.lateTime = int.tryParse(inputText2) ?? 5;
+                  cutList.thisIsCut = thisisCut;
+
+                  await client.CreateCutList(cutList);
+
+                  final result2 = await client.GetCutList(10);
+                  print(result2[0]);
+
+                  final namealaert = true;
                 },
                 child: const Text('作成'),
               ),
@@ -126,6 +202,70 @@ class MyApp extends StatelessWidget {
         label: const Text('追加'),
         icon: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+// class drawcards extends StatefulWidget {
+//   const drawcards({super.key});
+
+//   final int cardnumber = 0;
+
+//   @override
+//   State<drawcards> createState() => _drawcardsState();
+// }
+
+// class _drawcardsState extends State<drawcards> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Text("一つ目の要素"),
+
+//         Container(
+//           width: 120,
+//           height: 80,
+//           decoration: BoxDecoration(
+//             color: Colors.white,
+//             border: Border.all(color: Colors.black, width: 2),
+//           ),
+//           child: Text("こんにちは"),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+class DrawCards extends StatefulWidget {
+  final int cardNumber;
+
+  const DrawCards({super.key, required this.cardNumber});
+
+  @override
+  State<DrawCards> createState() => _DrawCardsState();
+}
+
+class _DrawCardsState extends State<DrawCards> {
+  @override
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text("カード一覧"),
+
+        for (int i = 0; i < widget.cardNumber; i++)
+          Container(
+            margin: const EdgeInsets.all(8),
+            width: 120,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black, width: 2),
+            ),
+            alignment: Alignment.center,
+            child: Text('こんにちは ${i + 1}'),
+          ),
+      ],
     );
   }
 }
@@ -145,10 +285,33 @@ class _createCutListState extends State<createCutList> {
   int defaultlateTime = 5;
 
   @override
+  void initState() {
+    super.initState();
+    // _loadCutLists();
+  }
+
+  // Future<void> _loadCutLists() async {
+  //   final client = GrpcClient();
+  //   final result2 = await client.GetCutList(10);
+  //   setState(() {
+  //     // DrawCardsに渡すデータを更新
+  //     final cardCount = result2.length;
+  //     DrawCards(cardNumber: cardCount);
+  //   });
+  //   await client.shutdown();
+  // }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Expanded(
+        //   child: ListView(
+        //     padding: const EdgeInsets.all(16),
+        //     children: [DrawCards(cardNumber: 10)],
+        //   ),
+        // ),
         Row(
           children: [
             ChoiceChip(
@@ -163,6 +326,7 @@ class _createCutListState extends State<createCutList> {
                     selectValueLate = 0; // もう一方をオフにする
                   }
                   latetime = false;
+                  thisisCut = true;
                 });
               },
             ),
@@ -178,12 +342,15 @@ class _createCutListState extends State<createCutList> {
                   }
                   // TextField();
                   latetime = true;
+                  thisisCut = false;
                 });
               },
             ),
           ],
         ),
         Text("授業名入力"),
+        if (namealaert)
+          Text("授業名を入力してください", style: TextStyle(color: Colors.red)),
         TextField(
           controller: myController1,
           // decoration: InputDecoration(hintText: '授業名'),

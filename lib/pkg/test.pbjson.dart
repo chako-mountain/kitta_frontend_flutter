@@ -155,6 +155,26 @@ final $typed_data.Uint8List res_getCutListDescriptor = $convert.base64Decode(
     'ABKANSCWxhdGVDb3VudBIdCgpjcmVhdGVkX2F0GAggASgJUgljcmVhdGVkQXQSHQoKdXBkYXRl'
     'ZF9hdBgJIAEoCVIJdXBkYXRlZEF0');
 
+@$core.Deprecated('Use res_getCutListListDescriptor instead')
+const res_getCutListList$json = {
+  '1': 'res_getCutListList',
+  '2': [
+    {
+      '1': 'cut_lists',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.tutorial.res_getCutList',
+      '10': 'cutLists'
+    },
+  ],
+};
+
+/// Descriptor for `res_getCutListList`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List res_getCutListListDescriptor = $convert.base64Decode(
+    'ChJyZXNfZ2V0Q3V0TGlzdExpc3QSNQoJY3V0X2xpc3RzGAEgAygLMhgudHV0b3JpYWwucmVzX2'
+    'dldEN1dExpc3RSCGN1dExpc3Rz');
+
 @$core.Deprecated('Use req_getCutHistoryDescriptor instead')
 const req_getCutHistory$json = {
   '1': 'req_getCutHistory',

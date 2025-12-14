@@ -109,6 +109,22 @@ class GrpcClient {
     }
   }
 
+  Future<List<res_getCutList>> GetCutList(int userId) async {
+    // final request = res_getCutList()..userId = Int64(userId);
+    final request = req_getCutList();
+    request.userId = Int64(userId); // <- req_getCutList 型を作る
+
+    final responseStream = cutListClient.getCutList(
+      request,
+    ); // <- int → request
+
+    final List<res_getCutList> cutLists = [];
+    await for (var cut in responseStream) {
+      cutLists.add(cut);
+    }
+    return cutLists;
+  }
+
   /// チャンネルをシャットダウン
   Future<void> shutdown() async {
     await _channel.shutdown();

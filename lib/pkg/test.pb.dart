@@ -768,6 +768,55 @@ class res_getCutList extends $pb.GeneratedMessage {
   void clearUpdatedAt() => $_clearField(9);
 }
 
+class res_getCutListList extends $pb.GeneratedMessage {
+  factory res_getCutListList({
+    $core.Iterable<res_getCutList>? cutLists,
+  }) {
+    final result = create();
+    if (cutLists != null) result.cutLists.addAll(cutLists);
+    return result;
+  }
+
+  res_getCutListList._();
+
+  factory res_getCutListList.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory res_getCutListList.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'res_getCutListList',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'tutorial'),
+      createEmptyInstance: create)
+    ..pPM<res_getCutList>(1, _omitFieldNames ? '' : 'cutLists',
+        subBuilder: res_getCutList.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  res_getCutListList clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  res_getCutListList copyWith(void Function(res_getCutListList) updates) =>
+      super.copyWith((message) => updates(message as res_getCutListList))
+          as res_getCutListList;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static res_getCutListList create() => res_getCutListList._();
+  @$core.override
+  res_getCutListList createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static res_getCutListList getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<res_getCutListList>(create);
+  static res_getCutListList? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<res_getCutList> get cutLists => $_getList(0);
+}
+
 class req_getCutHistory extends $pb.GeneratedMessage {
   factory req_getCutHistory({
     $fixnum.Int64? listId,
