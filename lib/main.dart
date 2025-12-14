@@ -138,20 +138,12 @@ class _MyAppState extends State<MyApp> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // DrawCards(cardNumber: cardCount),
-            // DrawCards(cardCount),
-            // DrawCards(cardNumber: cardCount),
-            // ListView(
-            //   padding: const EdgeInsets.all(16),
-            //   children: [DrawCards(cardNumber: 10)],
-            // ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(children: [DrawCards(cardNumber: cardcount)]),
               ),
             ),
 
-            // ListView(children: [DrawCards(cardNumber: 10)]),
             ElevatedButton(
               child: const Text("Send UUID"),
               onPressed: () async {
@@ -166,8 +158,7 @@ class _MyAppState extends State<MyApp> {
                   print("$i 番目の要素です");
                   print(result2[i]);
                 }
-                // print("これが0番目");
-                // print(result2[0]);
+
                 DrawCards(cardNumber: result2.length);
 
                 await client.shutdown();
@@ -215,13 +206,6 @@ class _MyAppState extends State<MyApp> {
                   setState(() {
                     _loadCutLists();
                   });
-
-                  // await client.CreateCutList(cutList);
-
-                  // final result2 = await client.GetCutList(10);
-                  // print(result2[0]);
-
-                  // final namealaert = true;
                 },
                 child: const Text('作成'),
               ),
@@ -234,36 +218,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// class drawcards extends StatefulWidget {
-//   const drawcards({super.key});
-
-//   final int cardnumber = 0;
-
-//   @override
-//   State<drawcards> createState() => _drawcardsState();
-// }
-
-// class _drawcardsState extends State<drawcards> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: [
-//         Text("一つ目の要素"),
-
-//         Container(
-//           width: 120,
-//           height: 80,
-//           decoration: BoxDecoration(
-//             color: Colors.white,
-//             border: Border.all(color: Colors.black, width: 2),
-//           ),
-//           child: Text("こんにちは"),
-//         ),
-//       ],
-//     );
-//   }
-// }
 
 class DrawCards extends StatefulWidget {
   final int cardNumber;
@@ -319,28 +273,11 @@ class _createCutListState extends State<createCutList> {
     // _loadCutLists();
   }
 
-  // Future<void> _loadCutLists() async {
-  //   final client = GrpcClient();
-  //   final result2 = await client.GetCutList(10);
-  //   setState(() {
-  //     // DrawCardsに渡すデータを更新
-  //     final cardCount = result2.length;
-  //     DrawCards(cardNumber: cardCount);
-  //   });
-  //   await client.shutdown();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Expanded(
-        //   child: ListView(
-        //     padding: const EdgeInsets.all(16),
-        //     children: [DrawCards(cardNumber: 10)],
-        //   ),
-        // ),
         Row(
           children: [
             ChoiceChip(
@@ -369,7 +306,6 @@ class _createCutListState extends State<createCutList> {
                   if (isSelected) {
                     selectValueCut = 0; // もう一方をオフにする
                   }
-                  // TextField();
                   latetime = true;
                   thisisCut = false;
                 });
@@ -380,25 +316,11 @@ class _createCutListState extends State<createCutList> {
         Text("授業名入力"),
         if (namealaert)
           Text("授業名を入力してください", style: TextStyle(color: Colors.red)),
-        TextField(
-          controller: myController1,
-          // decoration: InputDecoration(hintText: '授業名'),
-        ),
+        TextField(controller: myController1),
         if (latetime) ...[
           Text("遅刻時間入力 (分)"),
-          TextField(
-            controller: myController2,
-            // decoration: InputDecoration(hintText: '遅刻時間（分）'),
-          ),
+          TextField(controller: myController2),
         ],
-
-        // TextField(
-        //   decoration: InputDecoration(
-        //     labelText: "遅刻の理由",
-        //     border: OutlineInputBorder(),
-        //   ),
-        // ),
-        // Text("選択中: $result"),
       ],
     );
   }
