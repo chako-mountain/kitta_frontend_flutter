@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kitta_backend_flutter/pkg/test.pb.dart';
 import 'grpc/grpc_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateCutList {
   bool thisIsCut;
@@ -28,6 +29,7 @@ class CreateCutList {
 final bool namealaert = false;
 bool thisisCut = true;
 int userID = 0;
+var cardcount = 0;
 
 void main() {
   // runApp(const MyApp());
@@ -52,12 +54,16 @@ class _MyAppState extends State<MyApp> {
   final bool selectValue = false;
 
   Future<void> _loadCutLists() async {
+    // idを取得
+    userID = await storeUuid();
+
+    // 取得したuserIDのカットリスト取得
     final client = GrpcClient();
-    final result2 = await client.GetCutList(10);
+    final result2 = await client.GetCutList(userID);
     setState(() {
       // DrawCardsに渡すデータを更新
-      final cardCount = result2.length;
-      DrawCards(cardNumber: cardCount);
+      cardcount = result2.length;
+      // DrawCards(cardNumber: cardCount);
     });
     await client.shutdown();
   }
@@ -73,27 +79,43 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    storeUuid();
     _loadCutLists();
   }
 
-  Future<void> storeUuid(String uuid) async {
+  // ユーザーuuid登録関係
+  Future<int> storeUuid() async {
     final prefs = await SharedPreferences.getInstance();
     final String? action = prefs.getString('user_uuid');
-    print(action);
 
     if (action == null) {
-      // final client = GrpcClient();
-      await prefs.setString('user_uuid', uuid);
-      print("UUID stored: $uuid");
-      final userID = await client.CreateUser(uuid);
-      print(userID);
-      // userID = userid;
+      // ローカルにUUIDがない場合、新規生成
+      var uuid = Uuid();
+      String randomUuid = uuid.v4();
+      await prefs.setString('user_uuid', randomUuid);
+      print("UUID stored locally: $randomUuid");
+
+      // DBに登録
+      final int newUserID = await client.CreateUser(randomUuid) ?? 0;
+
+      if (newUserID == -1) {
+        // DBでUUIDが重複していた場合、再帰で新しいUUIDを作成
+        return await storeUuid();
+      }
+
+      return newUserID;
     } else {
-      final USERID = await client.getUserIdByUuid(
-        "3dd25cc6-c92a-4941-b736-5045afab5eaf",
-      );
-      print("UUID already exists: $action");
-      print(USERID);
+      // ローカルにUUIDがある場合、DBからuserIDを取得
+      final int? fetchedID = await client.getUserIdByUuid(action);
+
+      if (fetchedID != null) {
+        return fetchedID;
+      } else {
+        // DBに存在しなければ登録
+        final int? newUserID = await client.CreateUser(action);
+        // nullの場合は0を返す
+        return newUserID ?? 0;
+      }
     }
   }
 
@@ -125,7 +147,7 @@ class _MyAppState extends State<MyApp> {
             // ),
             Expanded(
               child: SingleChildScrollView(
-                child: Column(children: [DrawCards(cardNumber: 10)]),
+                child: Column(children: [DrawCards(cardNumber: cardcount)]),
               ),
             ),
 
@@ -134,8 +156,8 @@ class _MyAppState extends State<MyApp> {
               child: const Text("Send UUID"),
               onPressed: () async {
                 final client = GrpcClient();
-                const uuid = "3dd25cc6-c92a-4941-b736-5045afab5eaf";
-                await storeUuid(uuid);
+                // const uuid = "3dd25cc6-c92a-4941-b736-5045afab5eae";
+                await storeUuid();
                 // await client.CreateCutList(cutList); // 必要に応じて有効化
 
                 final result2 = await client.GetCutList(10);
@@ -187,12 +209,19 @@ class _MyAppState extends State<MyApp> {
                   cutList.lateTime = int.tryParse(inputText2) ?? 5;
                   cutList.thisIsCut = thisisCut;
 
+                  // カットリスト作成、登録
                   await client.CreateCutList(cutList);
 
-                  final result2 = await client.GetCutList(10);
-                  print(result2[0]);
+                  setState(() {
+                    _loadCutLists();
+                  });
 
-                  final namealaert = true;
+                  // await client.CreateCutList(cutList);
+
+                  // final result2 = await client.GetCutList(10);
+                  // print(result2[0]);
+
+                  // final namealaert = true;
                 },
                 child: const Text('作成'),
               ),
