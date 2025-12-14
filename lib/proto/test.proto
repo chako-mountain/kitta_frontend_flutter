@@ -78,12 +78,25 @@ message res_getCutHistory {
     string updated_at = 5;
 }
 
+message req_createCutHistory {
+    int64 id = 1;
+    bool this_is_cut = 2;
+    int64 late_time = 3;
+    string lists_updated_at = 4;
+    string updated_at = 5;
+}
+
+message res_createCutHistory {
+    int64 id = 1;
+}
+
 service CutListService {
     rpc CreateUser (reqcreateUser) returns (rescreateUser);
     rpc GetUserByUuid (req_getUserByUuid) returns (res_getUserByUuid);
     rpc GetCutList (req_getCutList) returns (stream res_getCutList);
     rpc GetHistory (req_getCutHistory) returns (stream res_getCutHistory);
     rpc CreateCutList(ReqCreateCutList) returns (ResCreateCutList);
+    rpc CreateCutHistory (req_createCutHistory) returns (res_createCutHistory);
 }
 
 
